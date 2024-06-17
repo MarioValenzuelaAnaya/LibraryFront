@@ -1,6 +1,5 @@
-// slices/booksSlice.js
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import axiosInstance from "../../app/Interceptors/axiosInterceptor"
 import {  toast } from 'react-toastify';
 
@@ -19,10 +18,10 @@ export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(response.data,"fetch");
+
       return response.data;
     } catch (error) {
-      console.error('Error fetching books:', error);
+
       throw error;
     }
   });
@@ -32,13 +31,13 @@ export const addBook = createAsyncThunk('books/addBook', async (newBook,{rejectW
   const response = await axiosInstance.post(API_URL, newBook);
   return response.data;
   }catch (error) {
-    console.error('Error returning loan:', error);
+
     return rejectWithValue(error.response.data);
   }
 });
 
 export const updateBook = createAsyncThunk('books/updateBook', async (newBook) => {
-  console.warn(newBook,"cambio")
+
   const response = await axiosInstance.post(`${API_URL}/UpdateBook`, newBook);
   return response.data;
 });

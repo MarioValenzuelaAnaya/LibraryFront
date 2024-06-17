@@ -1,46 +1,47 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React from "react";
 
 // Components
-import BookList from "./components/bookList";
-import TaskForm from "./components/TaskForm";
-import Login from "./components/login";
-import PrivateRoute from "./components/privateRoute";
+import BookList from "./components/Books/BookList";
+import BookForm from "./components/Books/BookForm";
+import Login from "./components/Login/Login";
+import PrivateRoute from "./components/Pages/PrivateRoute";
+import AuthWrapper from "./components/Login/AuthWrapper";
+import Navbar from "./components/Pages/NavBar";
 
 function App() {
   return (
     <div className="bg-slate-300 h-screen text-white">
-      <div className="flex items-center justify-center h-full">
-        <BrowserRouter>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <Navbar />
+        <div className="flex items-center justify-center h-full">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/" element={<BookList />} />
             <Route
-              path="/"
+              path="/create-book"
               element={
-                <PrivateRoute>
-                  <BookList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/create-task"
-              element={
-                <PrivateRoute>
-                  <TaskForm />
-                </PrivateRoute>
+                <AuthWrapper>
+                  <PrivateRoute>
+                    <BookForm />
+                  </PrivateRoute>
+                </AuthWrapper>
               }
             />
             <Route
               path="/edit-task/:id"
               element={
-                <PrivateRoute>
-                  <TaskForm />
-                </PrivateRoute>
+                <AuthWrapper>
+                  <PrivateRoute>
+                    <BookForm />
+                  </PrivateRoute>
+                </AuthWrapper>
               }
             />
           </Routes>
-        </BrowserRouter>
-      </div>
+        </div>
+      </BrowserRouter>
     </div>
   );
 }

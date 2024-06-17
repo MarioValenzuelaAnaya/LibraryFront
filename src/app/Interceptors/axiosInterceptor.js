@@ -1,6 +1,6 @@
+
 import axios from 'axios';
-
-
+import { logout } from '../../features/Slices/authSlice';
 
 const axiosInstance = axios.create();
 
@@ -17,6 +17,16 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-
+export const setAxiosInterceptors = (store) => {
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        store.dispatch(logout());
+      }
+      return Promise.reject(error);
+    }
+  );
+};
 
 export default axiosInstance;

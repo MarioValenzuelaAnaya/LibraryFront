@@ -1,5 +1,5 @@
 {
-  "name": "reac-rtk-crud",
+  "name": "Library",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://faztweb.github.io/react-rtk-crud",
@@ -17,6 +17,7 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
+    "react-tooltip": "^5.27.0",
     "redux-thunk": "^3.1.0",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4",

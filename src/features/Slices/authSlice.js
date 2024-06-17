@@ -1,10 +1,17 @@
-// src/features/auth/authSlice.js
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// URL de tu API de login
+
 const API_URL = 'https://localhost:7154/api/Account/Login';
 
+
+const initialState= {
+  email: localStorage.getItem('email') || null,
+  token: localStorage.getItem('token') || null, 
+  isLoading: false,
+  error: null,
+}
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -17,19 +24,24 @@ export const login = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('email'); 
+      return true; 
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: localStorage.getItem('token') || null, 
-    isLoading: false,
-    error: null,
-  },
+  initialState
+,
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -38,18 +50,39 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
+
         state.isLoading = false;
-        state.user = action.payload.user;
+        state.email = action.payload.email;
         state.token = action.payload.token;
         localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('email', action.payload.email);
+        
       })
       .addCase(login.rejected, (state, action) => {
+        
+        state.isLoading = false;
+        state.error = action.payload
+  
+      })
+      .addCase(logout.pending, (state) => {
+  
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+
+        state.isLoading = false;
+        state.email = null;
+        state.token = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+ 
         state.isLoading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+
 
 export default authSlice.reducer;

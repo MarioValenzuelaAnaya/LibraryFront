@@ -1,13 +1,19 @@
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { fetchLoans, returnLoan } from "../features/tasks/loanSlice";
-import { fetchBooks } from "../features/tasks/booksSlice";
-import { format } from 'date-fns';
+import { fetchLoans, returnLoan } from "../../features/Slices/loanSlice";
+import { fetchBooks } from "../../features/Slices/booksSlice";
+import { format } from "date-fns";
+import { Tooltip } from "react-tooltip";
+
 
 const LoanList = () => {
+ 
+  const email = useSelector((state) => state.auth.email);
   const dispatch = useDispatch();
-  const books = useSelector((state) => state.loans.list);
+  const loans = useSelector((state) => state.loans.list);
   const status = useSelector((state) => state.loans.status);
+  const isDisabled = !email;
+  const tooltipMessage = "You need to be logged in";
 
   useEffect(() => {
     if (status === "idle") {
@@ -16,14 +22,18 @@ const LoanList = () => {
   }, [status, dispatch]);
 
   useEffect(() => {
-    console.log("Books updated:", books);
-  }, [books]);
 
-  const handleReturn = async (id) => {
-    console.warn(id);
+  }, [loans]);
+
+  const handleReturnLoan = async (id) => {
+  
     await dispatch(returnLoan({ loanid: id }));
     await dispatch(fetchLoans());
     await dispatch(fetchBooks());
+  };
+
+  const formatLoanDate = (date) => {
+    return format(new Date(date), "dd/MM/yyyy HH:mm:ss");
   };
 
   return (
@@ -37,13 +47,13 @@ const LoanList = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
+                  Book Title
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Author
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Loan Date
+                  Loan Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -51,28 +61,39 @@ const LoanList = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {books.map((task) => (
-                <tr key={task.id}>
+              {loans.map((loan) => (
+                <tr key={loan.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {task.book.title}
+                      {loan.book?.title}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{task.book.author}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                    {format(new Date(task.loanDate), 'dd/MM/yyyy HH:mm:ss')}
+                      {loan.book?.author}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {formatLoanDate(loan.loanDate)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleReturn(task.id)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    <a
+                      data-tooltip-id="my-tooltip"
+                      data-tooltip-content={tooltipMessage}
                     >
-                      Return
-                    </button>
+                      <button
+                        onClick={() => handleReturnLoan(loan.id)}
+                        className={`text-green-600 hover:text-green-900 ${
+                          isDisabled ? "cursor-not-allowed text-gray-500" : ""
+                        }`}
+                        disabled={isDisabled}
+                        data-tip={isDisabled ? tooltipMessage : ""}
+                      >
+                        Return
+                      </button>
+                    </a>
                   </td>
                 </tr>
               ))}
@@ -80,6 +101,7 @@ const LoanList = () => {
           </table>
         </div>
       </div>
+      { isDisabled ? <Tooltip id="my-tooltip" />: ""}
     </div>
   );
 };

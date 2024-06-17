@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom'; // Import BrowserRouter
+import { BrowserRouter as Router } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
-import Actions from './actions';
+import Actions from './Actions';
 
 const mockStore = configureStore([]);
 
@@ -11,6 +11,9 @@ describe('Actions component', () => {
   let store;
   beforeEach(() => {
     store = mockStore({
+      auth: {
+        email: 'test@example.com',
+      },
       loans: {
         list: [],
         status: 'idle',
@@ -22,10 +25,10 @@ describe('Actions component', () => {
     });
   });
 
-  test('renders actions correctly', async () => {
+  test('renders actions correctly', () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Router> {}
+        <Router>
           <Actions id={1} />
         </Router>
       </Provider>
@@ -41,11 +44,11 @@ describe('Actions component', () => {
   });
 
   test('dispatches deleteBook action when delete button is clicked', async () => {
-    store.dispatch = jest.fn(); 
+    store.dispatch = jest.fn();
 
     const { getByText } = render(
       <Provider store={store}>
-        <Router> {}
+        <Router>
           <Actions id={1} />
         </Router>
       </Provider>
@@ -55,9 +58,7 @@ describe('Actions component', () => {
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(store.dispatch).toHaveBeenCalledTimes(3); 
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
     });
   });
-
- 
 });

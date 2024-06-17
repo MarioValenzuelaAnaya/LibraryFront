@@ -3,20 +3,22 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { store } from "./app/store";
+import { store } from "./Store/store";
 import { Provider } from "react-redux";
 import { ToastContainer } from 'react-toastify';
+import axiosInstance, { setAxiosInterceptors } from './app/Interceptors/axiosInterceptor';
 
-
+setAxiosInterceptors(store);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+
     <Provider store={store}>
       <App />
       <ToastContainer />
     </Provider>
-  </React.StrictMode>
+
   
 );
 
 reportWebVitals();
+export { axiosInstance }; 
